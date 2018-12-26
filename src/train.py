@@ -118,5 +118,9 @@ with session.graph.as_default():
             "predict": prediction_signature
         })
     builder.save()
-
+    
+    converter = tf.contrib.lite.TFLiteConverter.from_session(session, [tfX], [pY_given_X, y_max])
+    tflite_model = converter.convert()
+    open(export_path_base + os.sep + "converted.tflite", "wb").write(tflite_model)
+    
 session.close()
