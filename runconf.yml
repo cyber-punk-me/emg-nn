@@ -1,0 +1,9 @@
+image: tensorflow/tensorflow:latest-gpu-py3
+cmd:
+  - bash
+  - -c
+  - cd /src && python3 train.py
+opt:
+  exportSession: false
+  pullImages: true
+  runtime: nvidia
