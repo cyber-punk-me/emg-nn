@@ -2,7 +2,7 @@ image: tensorflow/tensorflow:latest-gpu-py3
 cmd:
   - bash
   - -c
-  - cd /src && python3 train.py
+  - pip3 install sklearn pandas && cd /src && python3 train.py
 opt:
   exportSession: false
   pullImages: true
