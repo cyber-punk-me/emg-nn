@@ -1,23 +1,23 @@
 cpu:
-  image: tensorflow/tensorflow:latest-py3
+  image: kyr7/emg-nn:cpu
   cmd:
-    - bash
-    - -c
-    - pip3 install sklearn pandas && cd /src && python3 train.py
+  - bash
+  - -c
+  - cd /src && python3 train.py
 nvidia:
-  image: tensorflow/tensorflow:latest-gpu-py3
+  image: kyr7/emg-nn:nvidia
   cmd:
-    - bash
-    - -c
-    - pip3 install sklearn pandas && cd /src && python3 train.py
+  - bash
+  - -c
+  - cd /src && python3 train.py
   opt:
     runtime: nvidia
 amd:
   image: rocm/tensorflow:rocm2.0-tf1.12-python3
   cmd:
-    - bash
-    - -c
-    - pip3 install sklearn pandas && cd /src && python3 train.py
+  - bash
+  - -c
+  - pip3 install sklearn pandas && cd /src && python3 train.py
   devices:
-    - /dev/kfd
-    - /dev/dri
+  - /dev/kfd
+  - /dev/dri
