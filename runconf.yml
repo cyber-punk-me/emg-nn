@@ -1,9 +1,23 @@
-image: tensorflow/tensorflow:latest-gpu-py3
-cmd:
-  - bash
-  - -c
-  - pip3 install sklearn pandas && cd /src && python3 train.py
-opt:
-  exportSession: false
-  pullImages: true
-  runtime: nvidia
+cpu:
+  image: tensorflow/tensorflow:latest-py3
+  cmd:
+    - bash
+    - -c
+    - pip3 install sklearn pandas && cd /src && python3 train.py
+nvidia:
+  image: tensorflow/tensorflow:latest-gpu-py3
+  cmd:
+    - bash
+    - -c
+    - pip3 install sklearn pandas && cd /src && python3 train.py
+  opt:
+    runtime: nvidia
+amd:
+  image: rocm/tensorflow:rocm2.0-tf1.12-python3
+  cmd:
+    - bash
+    - -c
+    - pip3 install sklearn pandas && cd /src && python3 train.py
+  devices:
+    - /dev/kfd
+    - /dev/dri
