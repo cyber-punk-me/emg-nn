@@ -12,12 +12,13 @@ from tensorflow.python.saved_model import signature_def_utils
 from tensorflow.python.saved_model.builder_impl import SavedModelBuilder
 
 data_path = str(Path("../data"))
-print(os.listdir(data_path))
 export_path_base = str(Path("../tf_export")) + os.sep
 
 tf.app.flags.DEFINE_integer('model_version', 1, 'version number of the model.')
 
 allFiles = glob.glob(data_path + os.sep + "*.csv")
+print(allFiles)
+
 list = []
 for file in allFiles:
     read = pd.read_csv(file, header = None)
@@ -26,8 +27,8 @@ df = pd.concat(list)
 
 D = 64 # number of input features
 M1 = 34 # first layer number of nodes, relatively arbitrarily chosen
-M2 = 17 # second hidden layer number of nodes, relatively arbitrarily chosen
-K = 4 # output layer nodes or number of classes
+M2 = 20 # second hidden layer number of nodes, relatively arbitrarily chosen
+K = 5 # output layer nodes or number of classes
 
 X = df.iloc[:, :-1].values
 Y = df.iloc[:, -1].values
@@ -50,7 +51,7 @@ def initialize_weights_and_biases(shape):
 def feed_forward(W3, W2, W1, b3, b2, b1, X):
     Z1 = tf.nn.relu(tf.matmul(X, W1) + b1)
     Z2 = tf.nn.relu(tf.matmul(Z1, W2) + b2)
-    return tf.matmul(Z2, W3) + b3
+    return tf.matmul(Z2, W3) + b3, Z2
 
 tfX = tf.placeholder(tf.float32, [None, D], name='input') # creates placeholder variables without actually assigning values to them yet
 tfY = tf.placeholder(tf.float32, [None, K], name='output') # None means it can take any size N total number of instances
@@ -63,7 +64,7 @@ b1 = initialize_weights_and_biases([M1])
 b2 = initialize_weights_and_biases([M2])
 b3 = initialize_weights_and_biases([K])
 
-pY_given_X = feed_forward(W3, W2, W1, b3, b2, b1, tfX)
+pY_given_X, mid_layer = feed_forward(W3, W2, W1, b3, b2, b1, tfX)
 y_max = tf.argmax(pY_given_X, dimension=1)
 
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
@@ -106,7 +107,8 @@ with session.graph.as_default():
         },
         outputs={
             "output" : utils.build_tensor_info(y_max),
-            "distr": utils.build_tensor_info(pY_given_X)
+            "distr": utils.build_tensor_info(pY_given_X),
+            "midLayer": utils.build_tensor_info(mid_layer)
         },
         method_name=signature_constants.PREDICT_METHOD_NAME
     )
@@ -119,7 +121,7 @@ with session.graph.as_default():
         })
     builder.save()
     
-    converter = tf.contrib.lite.TFLiteConverter.from_session(session, [tfX], [pY_given_X, y_max])
+    converter = tf.contrib.lite.TFLiteConverter.from_session(session, [tfX], [y_max, pY_given_X, mid_layer])
     tflite_model = converter.convert()
     open(export_path_base + os.sep + "converted.tflite", "wb").write(tflite_model)
     
