@@ -1,1 +1,1 @@
-# 2 Hidden Layers w/ ReLU Activation NN
+# 3 Hidden Layers w/ ReLU Activation NN
