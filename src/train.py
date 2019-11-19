@@ -33,6 +33,7 @@ D = NUM_SENSORS * NUM_READS # number of input features
 M1 = 25 # first layer number of nodes, relatively arbitrarily chosen
 M2 = 15 # second hidden layer number of nodes, relatively arbitrarily chosen
 M3 = 10 # third hidden layer number of nodes, relatively arbitrarily chosen
+
 K = 5 # output layer nodes or number of classes
 
 def read_data():
