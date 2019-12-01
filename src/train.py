@@ -26,13 +26,14 @@ for file in allFiles:
     list.append(read)
 df = pd.concat(list)
 
-NUM_READS = 8 # each row contains 8 reads
-NUM_SENSORS = 8 # each read has 8 sensors(channels)
+NUM_READS = 1 # each row contains 1 read
+NUM_SENSORS = 32 # each read has 8 sensors(channels) * 4 features
 
 D = NUM_SENSORS * NUM_READS # number of input features
-M1 = 40 # first layer number of nodes, relatively arbitrarily chosen
-M2 = 25 # second hidden layer number of nodes, relatively arbitrarily chosen
-M3 = 20 # third hidden layer number of nodes, relatively arbitrarily chosen
+M1 = 25 # first layer number of nodes, relatively arbitrarily chosen
+M2 = 15 # second hidden layer number of nodes, relatively arbitrarily chosen
+M3 = 10 # third hidden layer number of nodes, relatively arbitrarily chosen
+
 K = 5 # output layer nodes or number of classes
 
 def read_data():
@@ -82,7 +83,7 @@ def read_data_sliding():
     Xtrain, Xtest, Ytrain, Ytest = train_test_split(X, Y, test_size = 0.05)
     return Xtrain, Xtest, Ytrain, Ytest
 
-Xtrain, Xtest, Ytrain, Ytest = read_data_sliding()
+Xtrain, Xtest, Ytrain, Ytest = read_data()
 
 N = len(Ytrain)
 T = np.zeros((N, K))
@@ -127,14 +128,14 @@ y_max = tf.argmax(pY_given_X, dimension=1)
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
     labels = tfY, logits = pY_given_X))
 
-train_model = tf.train.GradientDescentOptimizer(0.1).minimize(cost)
+train_model = tf.train.GradientDescentOptimizer(0.01).minimize(cost)
 predict_output = tf.argmax(pY_given_X, 1) # 1 refers to axis = 1, meaning it does argmax on each instance n
 
 session = tf.Session()
 initializer = tf.global_variables_initializer()
 session.run(initializer)
 
-for i in range(2000):
+for i in range(8000):
     session.run(train_model, feed_dict = {tfX: Xtrain, tfY: T})
     pred = session.run(predict_output, feed_dict = {tfX:Xtrain, tfY:T})
     if i % 250 == 0:
